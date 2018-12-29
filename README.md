@@ -143,5 +143,5 @@ require.config({
 
 ### 配置项
 
-
+[点我查看配置项](./configuration.md)
 
