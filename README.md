@@ -143,5 +143,7 @@ require.config({
 
 ### 配置项
 
-[点我查看配置项](./configuration.md)
+[点我查看配置项](./configuration.md)  
+CodeMirror函数及其fromTextArea方法都将包含配置选项的对象作为第二个（可选）参数。 任何未提供的选项都将从CodeMirror.defaults中获取，CodeMirror.defaults是一个包含默认选项的对象。 您可以更新此对象以更改页面上的默认值。  
+不以任何方式检查选项，因此设置伪造选项值必然会导致奇怪的错误
 
