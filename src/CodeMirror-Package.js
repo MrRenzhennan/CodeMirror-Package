@@ -175,21 +175,21 @@ class CodeMirrorPackage extends Unit {
     }
     
 }
-//export { CodeMirrorPackage};
-//module.exports = {CodeMirrorPackage:CodeMirrorPackage}
+//export default CodeMirrorPackage;
+module.exports = CodeMirrorPackage
 
-const codemirrorpackage = new CodeMirrorPackage({
-	mode: 'text/javascript',
-	theme: 'colorforth'
-});
+// const codemirrorpackage = new CodeMirrorPackage({
+// 	mode: 'text/javascript',
+// 	theme: 'colorforth'
+// });
 
-codemirrorpackage.CodeMirrorInit();
-codemirrorpackage.SetSize();
-codemirrorpackage.CodeMirrorRunCode();
-codemirrorpackage.CodeMirrorSubmit(function(value) {
-	console.log(value);
-});
-codemirrorpackage.editor.on("change",(val)=>{
-    console.log(val)
-})
-console.log(codemirrorpackage);
+// codemirrorpackage.CodeMirrorInit();
+// codemirrorpackage.SetSize();
+// codemirrorpackage.CodeMirrorRunCode();
+// codemirrorpackage.CodeMirrorSubmit(function(value) {
+// 	console.log(value);
+// });
+// codemirrorpackage.editor.on("change",(val)=>{
+//     console.log(val)
+// })
+// console.log(codemirrorpackage);
