@@ -7,7 +7,8 @@ module.exports = {
     entry: './src/CodeMirror-Package.js',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'CodeMirror-Package.min.js'
+        filename: 'CodeMirror-Package.min.js',
+        libraryTarget: 'umd',
     },
     devServer: {
         contentBase: "./dist", //本地服务器所加载的页面所在的目录

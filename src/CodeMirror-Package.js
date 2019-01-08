@@ -32,6 +32,8 @@ class CodeMirrorPackage extends Unit {
 		super();
 		this.CodeMirror = CodeMirror;
 		this.old_opaction = {
+			frequency: 1,//创建编辑器编号
+			id: "",
 			value: '', //编辑器的起始值
 			mode: 'text/javascript', //编辑器解析模式
 			lineSeparator: null, //显式设置编辑器的行分隔符
@@ -43,11 +45,11 @@ class CodeMirrorPackage extends Unit {
 			indentWithTabs: false, //是否在缩进时，第一个N * tabSize空格应替换为N个制表符。 默认值为false。
 			electricChars: true, //配置编辑器在键入可能更改其正确缩进的字符时是否应重新缩进当前行（仅在模式支持缩进时才有效）
 			direction: 'ltr', //翻转整体布局并选择基本段落方向为从左到右或从右到左
-			lineWrapping: false, //对于较长的行，CodeMirror应该滚动还是换行,默认为false(滚动)。
+			lineWrapping: false, //对于较长的行，CodeMirror应该滚动还是换行,默认为false(滚动)。  该骂折叠
 			lineNumbers: true, //是否显示编辑器左侧的行号
 			firstLineNumber: 1, //从哪个数字开始计数行。默认值为1。
 			//lineNumberFormatter: function () { },//用于格式化行号的函数。 该函数传递给行号，并应返回将在装订线中显示的字符串
-			gutters: [ 'CodeMirror-linenumbers', 'CodeMirror-foldgutter' ],
+			gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
 			foldGutter: true, //确定装订线是否水平滚动内容（false）或在水平滚动期间是否保持固定（true，默认值）
 			scrollbarStyle: 'native', //滚动条默认样式  null
 			readOnly: false, //这将禁用用户编辑编辑器内容。如果指定了特殊值“nocursor”(而不是简单的true)，则也不允许编辑器聚焦
@@ -70,19 +72,22 @@ class CodeMirrorPackage extends Unit {
 			addModeClass: false, //启用时（默认情况下为off），将为每个标记添加一个额外的CSS类，指示生成它的（内部）模式，前缀为“cm-m-”。
 			maxHighlightLength: true, //当高亮显示长行时，为了保持响应，编辑会放弃，当它到达某个位置时，简单地将行的其余部分设为纯文本。默认值为10，000。可以将此设置为Infinity以关闭此行为。
 			//viewportMargin
-			matchBrackets: true //括号匹配
+			matchBrackets: true, //括号匹配
+			replaceFind: false,//启动搜索替换
+			fullScreen:false,//是否启用全屏
 			//specialChars:"",//一个正则表达式，用于确定哪些字符应该被特殊占位符替换
 			//specialCharPlaceholder:function(){},//给定由specialChars选项标识的特殊字符的函数，生成用于表示字符的DOM节点
 			//rtlMoveVisually:"",
 			//keyMap:"默认值为“default”",//配置要使用的键映射。
-			//extraKeys:null,//可用于为编辑器指定额外的键绑定
+			extraKeys:{},//可用于为编辑器指定额外的键绑定
 			//inputStyle:"",//选择CodeMirror处理输入和焦点的方式。 核心库定义了“textarea”和“contenteditable”输入模型
 			//configureMouse:function(){},//
 			//workTime
 			//workDelay
 		};
-        this.opaction = Object.assign(this.old_opaction, opaction);
-        this.editor = null;
+		this.opaction = Object.assign(this.old_opaction, opaction);
+		this.editor = [];
+		this.CodeMirrorInit();
 	}
 
 	//高亮选中
@@ -98,6 +103,64 @@ class CodeMirrorPackage extends Unit {
 			require('codemirror/addon/scroll/simplescrollbars');
 		}
 	}
+	//代码折叠
+	CodeFold() {
+		if (this.opaction.lineWrapping) {
+			require('codemirror/addon/fold/foldgutter.css');
+			require('codemirror/addon/fold/foldgutter.js');
+			require('codemirror/addon/fold/foldcode.js');
+			require('codemirror/addon/fold/brace-fold.js');
+			require('codemirror/addon/fold/comment-fold.js');
+			require('codemirror/addon/fold/indent-fold.js');
+			require('codemirror/addon/fold/xml-fold.js');
+			if (this.opaction.markdown) {
+				require('codemirror/addon/fold/markdown-fold');
+			}
+
+		}
+	}
+	//代码搜索替换
+	CodeReplaceFind() {
+		if (this.opaction.replaceFind) {
+			//搜索
+			require('codemirror/addon/search/search.js');
+			require('codemirror/addon/search/searchcursor.js');
+			//跳转到指定行
+			require('codemirror/addon/search/jump-to-line.js');
+			//搜索框美化
+			require('codemirror/addon/dialog/dialog.js');
+			require('codemirror/addon/dialog/dialog.css');
+		}
+		/**
+		 	Ctrl-F / Cmd-F
+			开始搜索
+			Ctrl-G / Cmd-G
+			找下一个
+			Shift-Ctrl-G / Shift-Cmd-G
+			找到上一个
+			Shift-Ctrl-F / Cmd-Option-F
+			更换
+			Shift-Ctrl-R / Shift-Cmd-Option-F
+			全部替换
+			ALT-G
+			跳到线上
+		*/
+	}
+	//全屏
+	FullScreen() {
+		if (this.opaction.fullScreen) {
+			require('codemirror/addon/display/fullscreen.css');
+			require('codemirror/addon/display/fullscreen.js');
+			this.opaction.extraKeys = Object.assign(this.opaction.extraKeys, {
+				"F11": function (cm) {
+					cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+				},
+				"Esc": function (cm) {
+					if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+				}
+			})
+		}
+	}
 	//主题
 	CodeMirrorTheme() {
 		switch (this.opaction.theme) {
@@ -110,23 +173,66 @@ class CodeMirrorPackage extends Unit {
 			case 'yeti':
 				require('codemirror/theme/yeti.css');
 				break;
+			case 'night':
+				require('codemirror/theme/night.css');
+				break;
 			default:
 				break;
 		}
 	}
 	//模式
 	CodeMirrorMode() {
-		if (this.opaction.mode == 'text/javascript') {
-			require('codemirror/mode/javascript/javascript.js');
+		switch (this.opaction.mode) {
+			case 'text/javascript':   //js
+				require('codemirror/mode/javascript/javascript.js');
+				break;
+			case 'text/x-java':   //java
+				require('codemirror/mode/clike/clike.js');
+				break;
+			case 'htmlmixed':  //html
+				require('codemirror/mode/htmlmixed/htmlmixed.js');
+				break;
+			case 'text/x-sql':   //sql
+				require('codemirror/mode/sql/sql.js');
+				break;
+			case 'text/x-c++src':  //c++
+				require('codemirror/mode/clike/clike.js');
+				break;
+			case 'text/x-csrc':   //c
+				require('codemirror/mode/clike/clike.js');
+				break;
+			case 'text/x-csharp':   //c#
+				require('codemirror/mode/clike/clike.js');
+				break;
+			case 'text/x-objectivec':   //objective-C
+				require('codemirror/mode/clike/clike.js');
+				break;
+			case 'text/x-go':   //go
+				require('codemirror/mode/go/go.js');
+				break;
+			case 'text/x-python':   //python
+				require('codemirror/mode/go/go.js');
+				break;
+			default:
+				break;
 		}
 	}
 	//初始化
 	CodeMirrorInit() {
+		if (!this.opaction.id) {
+			throw new Error("必须传入ID<document.getElementById()>");
+			return false;
+		};
 		this.CodeMirrorMode();
 		this.StyleActiveLine();
 		this.CodeMirrorTheme();
 		this.ScrollbarStyle();
-        this.editor = CodeMirror.fromTextArea(document.getElementById('code'), this.opaction);
+		this.CodeReplaceFind();
+		this.FullScreen();
+		this.CodeFold();
+		this.editor = CodeMirror.fromTextArea(document.getElementById(this.opaction.id), this.opaction);
+		this.SetSize();
+
 	}
 
 	//动态改变编辑器属性
@@ -134,23 +240,10 @@ class CodeMirrorPackage extends Unit {
 		this.editor.setOption(key, value);
 	}
 	//设置宽高
-	SetSize(width = '50%', height = this.getClientHeight()._innerHeight) {
+	SetSize(width = this.getClientHeight()._innerWidth /2, height = this.getClientHeight()._innerHeight) {
 		this.editor.setSize(width, height);
 	}
 
-	CodeMirrorRunCode() {
-		let buttonTag = document.createElement('button');
-		buttonTag.innerHTML = '运行';
-		buttonTag.setAttribute(
-			'style',
-			'position: absolute;top: 10px;right: 10px;z-index:100;width: 70px;height: 30px;'
-		);
-		buttonTag.onclick = function() {
-			console.log('运行');
-		};
-		let parentDom = document.getElementsByClassName('CodeMirror')[0];
-		parentDom.appendChild(buttonTag);
-	}
 
 	CodeMirrorSubmit(callback) {
 		let buttonTag = document.createElement('button');
@@ -169,27 +262,60 @@ class CodeMirrorPackage extends Unit {
 	}
 
 	GetValue(callback) {
-        if(callback){
-            callback(this.editor.getValue());
-        }
-    }
-    
-}
-//export default CodeMirrorPackage;
-module.exports = CodeMirrorPackage
+		if (callback) {
+			callback(this.editor.getValue());
+		}
+	}
 
-// const codemirrorpackage = new CodeMirrorPackage({
-// 	mode: 'text/javascript',
-// 	theme: 'colorforth'
-// });
+	OnChange(callback) {
+		this.editor.on("change", (instance, changeObject) => {
+			if (callback) {
+				callback(instance, changeObject, this.editor.getValue())
+			}
+		})
+	}
+
+	//右侧展示区
+	ShowCase(val = '展示区', style) {
+		let div = document.createElement('div');
+		let _style = style ? style : `position: absolute;
+										top: 0px;
+										right: 0px;
+										z-index:100;
+										width: 50%;
+										height: ${this.getClientHeight()._innerHeight}px;
+										background: #000;
+										box-sizing: border-box;
+										border-left: 1px solid#fff;
+										color: #fff;
+    									padding: 30px;
+										`;
+		div.setAttribute('style', _style);
+		div.innerHTML = val ? val : '';
+		let body = document.body;
+		body.appendChild(div);
+	}
+
+}
+export { CodeMirrorPackage };
+
+const codemirrorpackage = new CodeMirrorPackage({
+	id: "code",
+	mode: 'text/javascript',
+	theme: 'colorforth',
+	// scrollbarStyle: 'simple',
+	// lineWrapping:true,
+	// replaceFind:true,
+	//fullScreen:true
+	//frequency: 1,
+});
 
 // codemirrorpackage.CodeMirrorInit();
-// codemirrorpackage.SetSize();
-// codemirrorpackage.CodeMirrorRunCode();
-// codemirrorpackage.CodeMirrorSubmit(function(value) {
+// codemirrorpackage.ShowCase();
+// codemirrorpackage.CodeMirrorSubmit(function (value) {
 // 	console.log(value);
 // });
-// codemirrorpackage.editor.on("change",(val)=>{
-//     console.log(val)
+// codemirrorpackage.OnChange((instance, changeObject, getValue) => {
+// 	console.log(instance, changeObject, getValue)
 // })
-// console.log(codemirrorpackage);
+console.log(codemirrorpackage);
