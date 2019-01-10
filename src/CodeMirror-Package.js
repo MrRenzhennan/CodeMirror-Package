@@ -25,6 +25,45 @@ class Unit {
 
 		return { _innerHeight: this._innerHeight, _innerWidth: this._innerWidth };
 	}
+
+	//创建区间分隔
+	EditorResizer(_class = '') {
+		let div = document.createElement('div');
+		div.className = 'editor-resizer';
+		div.className += ` ${_class}`
+		if (_class) {
+			div.onclick = () => { console.log("区间") }
+		}
+		return div;
+	}
+
+	//title生成
+	TitleShow(text = '展示区') {
+		let div = document.createElement('div');
+		div.className = 'editor-title';
+		div.innerHTML = text;
+		return div;
+	}
+
+	//展示区DOM布局
+	DisplayArea(val, isTextarea, id, _class, style = '') {
+		let divP = document.createElement('div');
+		divP.className = 'displayArea-box';
+		divP.className += ` ${_class}`;
+		divP.setAttribute('style', style)
+		let divC = document.createElement('div');
+		divC.className = 'displayArea';
+		//是否增加 编辑器
+		if (isTextarea) {
+			let textarea = document.createElement('textarea');
+			textarea.id = id;
+			divC.appendChild(textarea);
+		}
+		divP.appendChild(divC);
+		divP.appendChild(this.TitleShow(val));
+		return divP;
+	}
+
 }
 
 class CodeMirrorPackage extends Unit {
@@ -32,8 +71,8 @@ class CodeMirrorPackage extends Unit {
 		super();
 		this.CodeMirror = CodeMirror;
 		this.old_opaction = {
-			frequency: 1,//创建编辑器编号
-			id: "",
+			operation_method:'1',
+			id: '',
 			value: '', //编辑器的起始值
 			mode: 'text/javascript', //编辑器解析模式
 			lineSeparator: null, //显式设置编辑器的行分隔符
@@ -73,21 +112,22 @@ class CodeMirrorPackage extends Unit {
 			maxHighlightLength: true, //当高亮显示长行时，为了保持响应，编辑会放弃，当它到达某个位置时，简单地将行的其余部分设为纯文本。默认值为10，000。可以将此设置为Infinity以关闭此行为。
 			//viewportMargin
 			matchBrackets: true, //括号匹配
-			replaceFind: false,//启动搜索替换
-			fullScreen:false,//是否启用全屏
+			replaceFind: false, //启动搜索替换
+			fullScreen: false, //是否启用全屏
 			//specialChars:"",//一个正则表达式，用于确定哪些字符应该被特殊占位符替换
 			//specialCharPlaceholder:function(){},//给定由specialChars选项标识的特殊字符的函数，生成用于表示字符的DOM节点
 			//rtlMoveVisually:"",
 			//keyMap:"默认值为“default”",//配置要使用的键映射。
-			extraKeys:{},//可用于为编辑器指定额外的键绑定
+			extraKeys: {} //可用于为编辑器指定额外的键绑定
 			//inputStyle:"",//选择CodeMirror处理输入和焦点的方式。 核心库定义了“textarea”和“contenteditable”输入模型
 			//configureMouse:function(){},//
 			//workTime
 			//workDelay
 		};
 		this.opaction = Object.assign(this.old_opaction, opaction);
-		this.editor = [];
-		this.CodeMirrorInit();
+		this.editor = null;
+		this.teacherEditor = null;
+		this.Init();
 	}
 
 	//高亮选中
@@ -100,7 +140,7 @@ class CodeMirrorPackage extends Unit {
 	ScrollbarStyle() {
 		if (this.opaction.scrollbarStyle == 'simple' || this.opaction.scrollbarStyle == 'overlay') {
 			require('codemirror/addon/scroll/simplescrollbars.css');
-			require('codemirror/addon/scroll/simplescrollbars');
+			require('codemirror/addon/scroll/simplescrollbars.js');
 		}
 	}
 	//代码折叠
@@ -116,7 +156,6 @@ class CodeMirrorPackage extends Unit {
 			if (this.opaction.markdown) {
 				require('codemirror/addon/fold/markdown-fold');
 			}
-
 		}
 	}
 	//代码搜索替换
@@ -152,13 +191,13 @@ class CodeMirrorPackage extends Unit {
 			require('codemirror/addon/display/fullscreen.css');
 			require('codemirror/addon/display/fullscreen.js');
 			this.opaction.extraKeys = Object.assign(this.opaction.extraKeys, {
-				"F11": function (cm) {
-					cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+				F11: function (cm) {
+					cm.setOption('fullScreen', !cm.getOption('fullScreen'));
 				},
-				"Esc": function (cm) {
-					if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+				Esc: function (cm) {
+					if (cm.getOption('fullScreen')) cm.setOption('fullScreen', false);
 				}
-			})
+			});
 		}
 	}
 	//主题
@@ -183,46 +222,187 @@ class CodeMirrorPackage extends Unit {
 	//模式
 	CodeMirrorMode() {
 		switch (this.opaction.mode) {
-			case 'text/javascript':   //js
+			case 'text/javascript': //js
 				require('codemirror/mode/javascript/javascript.js');
 				break;
-			case 'text/x-java':   //java
+			case 'text/x-java': //java
 				require('codemirror/mode/clike/clike.js');
 				break;
-			case 'htmlmixed':  //html
+			case 'htmlmixed': //html
 				require('codemirror/mode/htmlmixed/htmlmixed.js');
 				break;
-			case 'text/x-sql':   //sql
+			case 'text/x-sql': //sql
 				require('codemirror/mode/sql/sql.js');
 				break;
-			case 'text/x-c++src':  //c++
+			case 'text/x-c++src': //c++
 				require('codemirror/mode/clike/clike.js');
 				break;
-			case 'text/x-csrc':   //c
+			case 'text/x-csrc': //c
 				require('codemirror/mode/clike/clike.js');
 				break;
-			case 'text/x-csharp':   //c#
+			case 'text/x-csharp': //c#
 				require('codemirror/mode/clike/clike.js');
 				break;
-			case 'text/x-objectivec':   //objective-C
+			case 'text/x-objectivec': //objective-C
 				require('codemirror/mode/clike/clike.js');
 				break;
-			case 'text/x-go':   //go
+			case 'text/x-go': //go
 				require('codemirror/mode/go/go.js');
 				break;
-			case 'text/x-python':   //python
+			case 'text/x-python': //python
 				require('codemirror/mode/go/go.js');
 				break;
 			default:
 				break;
 		}
 	}
-	//初始化
-	CodeMirrorInit() {
-		if (!this.opaction.id) {
-			throw new Error("必须传入ID<document.getElementById()>");
-			return false;
+	//dom布局
+	DomLayout() {
+		/*创建外层dom*/
+		let div = document.createElement('div');
+		div.className = 'CodeMirrorPackage';
+		div.id = 'CodeMirror-Layout';
+		/*增加分区 */
+		div.appendChild(this.EditorResizer());
+		/* 编程要求 */
+		div.appendChild(
+			this.DisplayArea(
+				this.opaction.text_text[0] || '编程要求',
+				false,
+				'',
+				'programming-requirements',
+			)
+		);
+		/*增加分区 */
+		div.appendChild(this.EditorResizer('col-resize'));
+		/* 编程实践 */
+		div.appendChild(
+			this.DisplayArea(
+				this.opaction.text_text[1] || '编程实践区',
+				true,
+				this.opaction.id,
+				'programming-practice-displayArea',
+			)
+		);
+		/*增加分区 */
+		div.appendChild(this.EditorResizer('col-resize'));
+		//操作式 三块分区    命题式 四块分区   1 操作式  2 命题式
+		if (this.opaction.operation_method == '1') {
+			/* 样式展示区 */
+			div.appendChild(
+				this.DisplayArea(
+					this.opaction.text_text[2] || '样式展示区',
+					false,
+					'',
+					'show-case',
+				)
+			);
+			/*增加分区 */
+			div.appendChild(this.EditorResizer());
+		} else if (this.opaction.operation_method == '2') {
+			//样式展示区 教师源码  二者逻辑控制 交替出现
+			/* 样式展示区 */
+			div.appendChild(
+				this.DisplayArea(
+					this.opaction.text_text[2] || '样式展示区',
+					false,
+					'',
+					'show-case',
+				)
+			);
+			/* 教师源码 */
+			div.appendChild(
+				this.DisplayArea(
+					this.opaction.text_text[3] || '教师源码',
+					true,
+					'teacher-source-code',
+					'teacher-source-code',
+					'display:none'
+				)
+			);
+			/*增加分区 */
+			div.appendChild(this.EditorResizer('col-resize'));
+			/* 要求样式 */
+			div.appendChild(
+				this.DisplayArea(
+					this.opaction.text_text[4] || '要求样式',
+					false,
+					'',
+					'request-style',
+				)
+			);
+			/*增加分区 */
+			div.appendChild(this.EditorResizer());
+		}
+		let body = document.body;
+		body.appendChild(div);
+		this.CenterDomWidth();
+	}
+	//初始化内容宽度
+	CenterDomWidth() {
+		let width;
+		//总盒子宽度
+		let boxWidth = document.getElementById('CodeMirror-Layout').offsetWidth;
+		//分割条宽度 百分比
+		let resizer = (document.getElementsByClassName('editor-resizer')[0].offsetWidth / boxWidth).toFixed(6);
+		if (this.opaction.operation_method == '1') {
+			width = `${(100 - resizer * 4 * 100) / 4}%`;
+		} else if (this.opaction.operation_method == '2') {
+			width = `${(100 - resizer * 5 * 100) / 4}%`;
 		};
+		//编程要求
+		document.getElementsByClassName('programming-requirements')[0].style.width = width;
+		//编程实践
+		document.getElementsByClassName('programming-practice-displayArea')[0].style.width = width;
+		//样式展示
+		document.getElementsByClassName('show-case')[0].style.width = this.opaction.operation_method == '2' ? width : `${(100 - resizer * 4 * 100) / 2}%`;
+		if (this.opaction.operation_method == '2') {
+			//教师源码
+			document.getElementsByClassName('teacher-source-code')[0].style.width = width;
+			//要求样式
+			document.getElementsByClassName('request-style')[0].style.width = width;
+		}
+	}
+	//编程实践区 操作按钮生成
+	OperationButtonGeneration() {
+		// let parent = document.getElementsByClassName('programming-practice-displayArea')[0];
+		// let div = document.createElement('div');
+		// div.className = 'operation';
+		// //重置编码
+		// let button1 = document.createElement('button');
+		// button1.className = 'button1';
+		// button1.innerHTML = '重置编码';
+		// //获取源码
+		// let button2 = document.createElement('button');
+		// button2.className = 'button2';
+		// button2.innerHTML = '重置编码';
+		// //点击运行
+		// let button1 = document.createElement('button');
+		// button3.className = 'button3';
+		// button3.innerHTML = '重置编码';
+		// parent.appendChild(div)
+	}
+	//教师源码展示区
+	TeacherSourceCode() {
+		this.teacherEditor = CodeMirror.fromTextArea(document.getElementById('teacher-source-code'), this.opaction);
+		this.teacherEditor.setSize('100%', '100%');
+		this.teacherEditor.setOption("readOnly", 'nocursor');
+	}
+	//教师展示区赋值
+	TeacherSourceSetVal(val = '') {
+		this.teacherEditor.setValue(val)
+	}
+	//编辑器生成
+	CodeMirrorInit() {
+		this.editor = CodeMirror.fromTextArea(document.getElementById(this.opaction.id), this.opaction);
+	}
+	//初始化
+	Init() {
+		if (!this.opaction.id) {
+			throw new Error('必须传入ID<document.getElementById()>');
+			return false;
+		}
+		
 		this.CodeMirrorMode();
 		this.StyleActiveLine();
 		this.CodeMirrorTheme();
@@ -230,9 +410,16 @@ class CodeMirrorPackage extends Unit {
 		this.CodeReplaceFind();
 		this.FullScreen();
 		this.CodeFold();
-		this.editor = CodeMirror.fromTextArea(document.getElementById(this.opaction.id), this.opaction);
-		this.SetSize();
 
+
+		this.DomLayout();
+
+		this.CodeMirrorInit();
+		if(this.opaction.operation_method == '2'){
+			this.TeacherSourceCode();
+		}
+		
+		this.SetSize();
 	}
 
 	//动态改变编辑器属性
@@ -240,25 +427,8 @@ class CodeMirrorPackage extends Unit {
 		this.editor.setOption(key, value);
 	}
 	//设置宽高
-	SetSize(width = this.getClientHeight()._innerWidth /2, height = this.getClientHeight()._innerHeight) {
+	SetSize(width = '100%', height = '100%') {
 		this.editor.setSize(width, height);
-	}
-
-
-	CodeMirrorSubmit(callback) {
-		let buttonTag = document.createElement('button');
-		buttonTag.innerHTML = '提交';
-		buttonTag.setAttribute(
-			'style',
-			'position: absolute;top: 10px;right: 90px;z-index:100;width: 70px;height: 30px;'
-		);
-		//var _this = this;
-		buttonTag.onclick = () => {
-			console.log('提交');
-			this.GetValue(callback);
-		};
-		let parentDom = document.getElementsByClassName('CodeMirror')[0];
-		parentDom.appendChild(buttonTag);
 	}
 
 	GetValue(callback) {
@@ -268,54 +438,29 @@ class CodeMirrorPackage extends Unit {
 	}
 
 	OnChange(callback) {
-		this.editor.on("change", (instance, changeObject) => {
+		this.editor.on('change', (instance, changeObject) => {
 			if (callback) {
-				callback(instance, changeObject, this.editor.getValue())
+				callback(instance, changeObject, this.editor.getValue());
 			}
-		})
+		});
 	}
-
-	//右侧展示区
-	ShowCase(val = '展示区', style) {
-		let div = document.createElement('div');
-		let _style = style ? style : `position: absolute;
-										top: 0px;
-										right: 0px;
-										z-index:100;
-										width: 50%;
-										height: ${this.getClientHeight()._innerHeight}px;
-										background: #000;
-										box-sizing: border-box;
-										border-left: 1px solid#fff;
-										color: #fff;
-    									padding: 30px;
-										`;
-		div.setAttribute('style', _style);
-		div.innerHTML = val ? val : '';
-		let body = document.body;
-		body.appendChild(div);
-	}
-
 }
 export { CodeMirrorPackage };
 
 const codemirrorpackage = new CodeMirrorPackage({
-	id: "code",
+	id: 'code',
 	mode: 'text/javascript',
 	theme: 'colorforth',
-	// scrollbarStyle: 'simple',
-	// lineWrapping:true,
-	// replaceFind:true,
+	text_text: ['操作要求', '编程实践区', '样式展示区'],
+	//text_text: ['操作要求', '编程实践区', '样式展示区', '教师源码', '样式要求'],
+	operation_method: '1', //1 操作式  2 命题式
+	scrollbarStyle: 'simple',
+	lineWrapping: true,
+	replaceFind:true,
 	//fullScreen:true
-	//frequency: 1,
 });
 
-// codemirrorpackage.CodeMirrorInit();
-// codemirrorpackage.ShowCase();
-// codemirrorpackage.CodeMirrorSubmit(function (value) {
-// 	console.log(value);
-// });
-// codemirrorpackage.OnChange((instance, changeObject, getValue) => {
-// 	console.log(instance, changeObject, getValue)
-// })
+	//codemirrorpackage.TeacherSourceSetVal('123');
+
+
 console.log(codemirrorpackage);
