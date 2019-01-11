@@ -389,11 +389,18 @@ class CodeMirrorPackage extends Unit {
 				let next_width = nextDom.getAttribute('data-width');
 				let diffX = event.clientX;//按下时  鼠标位置
 				document.onmousemove = (event) => {
+					event.preventDefault()
 					let clientXMove = ((diffX - event.clientX) / window.innerWidth * 100);
-					prevDom.style.width = `${(Number(prev_width) - clientXMove).toFixed(4)}%`;
-					nextDom.style.width = `${(Number(next_width) + clientXMove).toFixed(4)}%`;
-					prevDom.setAttribute('data-width', `${(Number(prev_width) - clientXMove).toFixed(4)}`);
-					nextDom.setAttribute('data-width', `${(Number(next_width) + clientXMove).toFixed(4)}`);
+
+					if(prevDom.offsetWidth > 1){
+						nextDom.style.width = `${(Number(next_width) + clientXMove).toFixed(4)}%`;
+						nextDom.setAttribute('data-width', `${(Number(next_width) + clientXMove).toFixed(4)}`);
+					}
+					if(nextDom.offsetWidth >1){
+						prevDom.style.width = `${(Number(prev_width) - clientXMove).toFixed(4)}%`;
+						prevDom.setAttribute('data-width', `${(Number(prev_width) - clientXMove).toFixed(4)}`);
+						
+					}
 				};
 				document.onmouseup = function (event) {
 					this.onmousemove = null;

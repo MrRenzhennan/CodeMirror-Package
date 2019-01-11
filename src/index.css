@@ -41,6 +41,7 @@
 	box-sizing: border-box;
 	float: left;
 	position: relative;
+	overflow: hidden;
 }
 .CodeMirrorPackage .displayArea-box .displayArea {
 	width: 100%;
