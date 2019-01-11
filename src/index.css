@@ -19,11 +19,11 @@
 	border-right: 1px solid rgba(0, 0, 0, 0.4);
 	background: #36383f;
 	box-sizing: border-box;
-    height: 100%;
-    float: left;
+	height: 100%;
+	float: left;
 }
-.CodeMirrorPackage .col-resize{
-    cursor: col-resize;
+.CodeMirrorPackage .col-resize {
+	cursor: col-resize;
 }
 .CodeMirrorPackage .editor-title {
 	height: 40px;
@@ -47,11 +47,30 @@
 	height: 100%;
 	background: #000;
 }
-.CodeMirrorPackage .programming-practice-displayArea .operation{
-    position: absolute;
-    width: 100%;
-    bottom: 0;
+.CodeMirrorPackage .programming-practice-displayArea .operation {
+	position: absolute;
+	width: 100%;
+	bottom: 33px;
 }
-.CodeMirrorPackage .programming-practice-displayArea .operation .button1{
-    position: absolute;
+.CodeMirrorPackage .programming-practice-displayArea .operation button {
+	position: absolute;
+	padding: 5px;
+	border: none;
+	color: #fff;
+}
+.CodeMirrorPackage .programming-practice-displayArea .operation .button1 {
+	left: 0;
+	background: #ff6600;
+}
+.CodeMirrorPackage .programming-practice-displayArea .operation .button2 {
+	right: 0;
+	background: #ff0000;
+}
+.CodeMirrorPackage .programming-practice-displayArea .operation .button3 {
+	right: 100px;
+	background: #666666;
+}
+.CodeMirrorPackage .programming-practice-displayArea .operation .button4 {
+	right: 100px;
+	background: #3399FF;
 }

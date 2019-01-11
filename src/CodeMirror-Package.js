@@ -22,8 +22,6 @@ class Unit {
 			this._innerWidth = document.body.clientWidth;
 			this._innerHeight = document.body.clientHeight;
 		}
-
-		return { _innerHeight: this._innerHeight, _innerWidth: this._innerWidth };
 	}
 
 	//创建区间分隔
@@ -31,9 +29,6 @@ class Unit {
 		let div = document.createElement('div');
 		div.className = 'editor-resizer';
 		div.className += ` ${_class}`
-		if (_class) {
-			div.onclick = () => { console.log("区间") }
-		}
 		return div;
 	}
 
@@ -71,7 +66,6 @@ class CodeMirrorPackage extends Unit {
 		super();
 		this.CodeMirror = CodeMirror;
 		this.old_opaction = {
-			operation_method:'1',
 			id: '',
 			value: '', //编辑器的起始值
 			mode: 'text/javascript', //编辑器解析模式
@@ -139,6 +133,7 @@ class CodeMirrorPackage extends Unit {
 	//滚动条样式
 	ScrollbarStyle() {
 		if (this.opaction.scrollbarStyle == 'simple' || this.opaction.scrollbarStyle == 'overlay') {
+			console.log("simple")
 			require('codemirror/addon/scroll/simplescrollbars.css');
 			require('codemirror/addon/scroll/simplescrollbars.js');
 		}
@@ -337,6 +332,7 @@ class CodeMirrorPackage extends Unit {
 		let body = document.body;
 		body.appendChild(div);
 		this.CenterDomWidth();
+		this.ResizerMove();
 	}
 	//初始化内容宽度
 	CenterDomWidth() {
@@ -352,35 +348,123 @@ class CodeMirrorPackage extends Unit {
 		};
 		//编程要求
 		document.getElementsByClassName('programming-requirements')[0].style.width = width;
+		document.getElementsByClassName('programming-requirements')[0].setAttribute('data-width', width.split('%')[0]);
+		document.getElementsByClassName('programming-requirements')[0].setAttribute('old-width', width);
 		//编程实践
 		document.getElementsByClassName('programming-practice-displayArea')[0].style.width = width;
+		document.getElementsByClassName('programming-practice-displayArea')[0].setAttribute('data-width', width.split('%')[0]);
+		document.getElementsByClassName('programming-practice-displayArea')[0].setAttribute('old-width', width);
 		//样式展示
 		document.getElementsByClassName('show-case')[0].style.width = this.opaction.operation_method == '2' ? width : `${(100 - resizer * 4 * 100) / 2}%`;
+		document.getElementsByClassName('show-case')[0].setAttribute('data-width', (this.opaction.operation_method == '2' ? width.split('%')[0] : `${(100 - resizer * 4 * 100) / 2}`));
+		document.getElementsByClassName('show-case')[0].setAttribute('old-width', (this.opaction.operation_method == '2' ? width : `${(100 - resizer * 4 * 100) / 2}%`));
 		if (this.opaction.operation_method == '2') {
 			//教师源码
 			document.getElementsByClassName('teacher-source-code')[0].style.width = width;
+			document.getElementsByClassName('teacher-source-code')[0].setAttribute('data-width', width.split('%')[0]);
+			document.getElementsByClassName('teacher-source-code')[0].setAttribute('old-width', width);
 			//要求样式
 			document.getElementsByClassName('request-style')[0].style.width = width;
+			document.getElementsByClassName('request-style')[0].setAttribute('data-width', width.split('%')[0]);
+			document.getElementsByClassName('request-style')[0].setAttribute('old-width', width);
+		}
+	}
+	//分区左右滑动
+	ResizerMove() {
+		//事件委托
+		let EventParent = document.querySelector("#CodeMirror-Layout");
+		EventParent.onmousedown = () => {
+			let event = event || window.event;
+			let _target = event.target || event.srcElement;
+			if (_target.getAttribute('class').includes('col-resize')) {
+				let prevDom = _target.previousSibling;//获取上一个兄弟节点
+				let nextDom = _target.nextSibling;//获取下一个兄弟节点
+				if (_target.previousSibling.style.display == 'none') {
+					prevDom = _target.previousSibling.previousSibling;
+				};
+				if (_target.nextSibling.style.display == 'none') {
+					nextDom = _target.nextSibling.nextSibling;
+				};
+				let prev_width = prevDom.getAttribute('data-width');
+				let next_width = nextDom.getAttribute('data-width');
+				let diffX = event.clientX;//按下时  鼠标位置
+				document.onmousemove = (event) => {
+					let clientXMove = ((diffX - event.clientX) / window.innerWidth * 100);
+					prevDom.style.width = `${(Number(prev_width) - clientXMove).toFixed(4)}%`;
+					nextDom.style.width = `${(Number(next_width) + clientXMove).toFixed(4)}%`;
+					prevDom.setAttribute('data-width', `${(Number(prev_width) - clientXMove).toFixed(4)}`);
+					nextDom.setAttribute('data-width', `${(Number(next_width) + clientXMove).toFixed(4)}`);
+				};
+				document.onmouseup = function (event) {
+					this.onmousemove = null;
+					this.onmouseup = null;
+				};
+			};
+		};
+	};
+	//展示区宽度还原
+	DisplayAreaWidthRestore() {
+		let domList = document.getElementsByClassName('displayArea-box');
+		for (let i = 0; i < domList.length; i++) {
+			domList[i].style.width = domList[i].getAttribute('old-width');
+			domList[i].setAttribute('data-width', domList[i].getAttribute('old-width').split('%')[0]);
 		}
 	}
 	//编程实践区 操作按钮生成
 	OperationButtonGeneration() {
-		// let parent = document.getElementsByClassName('programming-practice-displayArea')[0];
-		// let div = document.createElement('div');
-		// div.className = 'operation';
-		// //重置编码
-		// let button1 = document.createElement('button');
-		// button1.className = 'button1';
-		// button1.innerHTML = '重置编码';
-		// //获取源码
-		// let button2 = document.createElement('button');
-		// button2.className = 'button2';
-		// button2.innerHTML = '重置编码';
-		// //点击运行
-		// let button1 = document.createElement('button');
-		// button3.className = 'button3';
-		// button3.innerHTML = '重置编码';
-		// parent.appendChild(div)
+		let parent = document.getElementsByClassName('programming-practice-displayArea')[0];
+		let div = document.createElement('div');
+		div.className = 'operation';
+		//重置编码
+		let button1 = document.createElement('button');
+		button1.className = 'button1';
+		button1.innerHTML = '重置编码';
+		button1.onclick = () => {
+			this.ResetContent();
+		};
+		//点击运行
+		let button2 = document.createElement('button');
+		button2.className = 'button2';
+		button2.innerHTML = '点击运行';
+		button2.onclick = () => {
+
+		};
+		//获取源码
+		let button3 = document.createElement('button');
+		button3.className = 'button3';
+		button3.innerHTML = '获取源码';
+		button3.onclick = () => {
+			button4.style.display = 'block';
+			button1.style.display = 'none';
+			button2.style.display = 'none';
+			button3.style.display = 'none';
+			document.getElementsByClassName('show-case')[0].style.display = 'none';
+			document.getElementsByClassName('teacher-source-code')[0].style.display = 'block';
+			this.DisplayAreaWidthRestore()
+		};
+
+		//继续实践
+		var button4 = document.createElement('button');
+		button4.className = 'button4';
+		button4.innerHTML = '继续实践';
+		button4.style.display = 'none';
+		button4.onclick = (_this) => {
+			button4.style.display = 'none';
+			button1.style.display = 'block';
+			button2.style.display = 'block';
+			button3.style.display = 'block';
+			document.getElementsByClassName('show-case')[0].style.display = 'block';
+			document.getElementsByClassName('teacher-source-code')[0].style.display = 'none';
+			this.DisplayAreaWidthRestore()
+		};
+
+		div.appendChild(button1);
+		div.appendChild(button2);
+		if (this.opaction.operation_method == '2') {
+			div.appendChild(button3);
+			div.appendChild(button4);
+		};
+		parent.appendChild(div)
 	}
 	//教师源码展示区
 	TeacherSourceCode() {
@@ -402,7 +486,7 @@ class CodeMirrorPackage extends Unit {
 			throw new Error('必须传入ID<document.getElementById()>');
 			return false;
 		}
-		
+		//插件
 		this.CodeMirrorMode();
 		this.StyleActiveLine();
 		this.CodeMirrorTheme();
@@ -411,14 +495,15 @@ class CodeMirrorPackage extends Unit {
 		this.FullScreen();
 		this.CodeFold();
 
-
-		this.DomLayout();
+		if(this.opaction.operation_method == '1' || this.opaction.operation_method == '2'){
+			this.DomLayout();
+			if (this.opaction.operation_method == '2') {
+				this.TeacherSourceCode();
+			};
+			this.OperationButtonGeneration();
+		};
 
 		this.CodeMirrorInit();
-		if(this.opaction.operation_method == '2'){
-			this.TeacherSourceCode();
-		}
-		
 		this.SetSize();
 	}
 
@@ -431,12 +516,16 @@ class CodeMirrorPackage extends Unit {
 		this.editor.setSize(width, height);
 	}
 
+	//获取编辑器内容
 	GetValue(callback) {
 		if (callback) {
 			callback(this.editor.getValue());
 		}
 	}
-
+	//重置内容
+	ResetContent() {
+		this.editor.setValue('')
+	}
 	OnChange(callback) {
 		this.editor.on('change', (instance, changeObject) => {
 			if (callback) {
@@ -451,16 +540,19 @@ const codemirrorpackage = new CodeMirrorPackage({
 	id: 'code',
 	mode: 'text/javascript',
 	theme: 'colorforth',
-	text_text: ['操作要求', '编程实践区', '样式展示区'],
-	//text_text: ['操作要求', '编程实践区', '样式展示区', '教师源码', '样式要求'],
-	operation_method: '1', //1 操作式  2 命题式
-	scrollbarStyle: 'simple',
+	//text_text: ['操作要求', '编程实践区', '样式展示区'],
+	text_text: ['操作要求', '编程实践区', '样式展示区', '教师源码', '样式要求'],
+	operation_method: '2', //1 操作式  2 命题式
+	scrollbarStyle: 'overlay',
 	lineWrapping: true,
-	replaceFind:true,
+	replaceFind: true,
 	//fullScreen:true
 });
 
-	//codemirrorpackage.TeacherSourceSetVal('123');
+codemirrorpackage.OnChange(function(instance, changeObject,val){
+	console.log(instance, changeObject,val)
+});
+codemirrorpackage.TeacherSourceSetVal('123');
 
 
 console.log(codemirrorpackage);
