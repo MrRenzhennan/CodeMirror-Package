@@ -8,6 +8,41 @@
 
 ## 封装方法调用
 ```js
+const codemirrorpackage = new CodeMirrorPackage({
+	//id: 'test',
+	mode: 'htmlmixed',
+	text_text: ['操作要求', '编程实践区', '样式展示区'],
+	//text_text: ['操作要求', '编程实践区', '样式展示区', '教师源码', '样式要求'],
+	operation_method: '1', //1 操作式  2 命题式
+	replaceFind: true,
+	//fullScreen:true
+});
+
+//显示按钮 切换模式
+codemirrorpackage.SelectGeneration();
+
+//操作要求赋值
+codemirrorpackage.programmingRequirementsSetVal('操作要求')
+
+//编辑器change事件
+codemirrorpackage.OnChange(function (instance, changeObject, val) {
+	console.log(instance, changeObject, val)
+});
+
+//开始运行
+codemirrorpackage.AddEventForRun((val) => {
+	//样式展示区赋值
+	codemirrorpackage.ShowCaseSetVal(val)
+})
+
+//要求样式 赋值
+codemirrorpackage.RequestStyleSetVal('<h1>要求样式</h1>')
+
+//教师源码赋值
+codemirrorpackage.TeacherSourceSetVal('123');
+
+
+console.log(codemirrorpackage);
 ```
 
 # CodeMirror介绍
