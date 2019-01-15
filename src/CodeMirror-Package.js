@@ -99,6 +99,7 @@ class CodeMirrorPackage extends Unit {
 		this.old_opaction = {
 			id: '',
 			value: '', //编辑器的起始值
+			operation_method: '',//是否需要渲染布局
 			mode: 'text/javascript', //编辑器解析模式
 			SupportMode: [
 				{ text: 'javascript', mode: 'text/javascript' },
@@ -289,6 +290,16 @@ class CodeMirrorPackage extends Unit {
 				break;
 		}
 	}
+	//直接初始化编辑器  不渲染布局
+	DomLayoutNull() {
+		if (this.opaction.id) {
+			let parent = document.querySelector(`#${this.opaction.id}`);
+			let textarea = document.createElement('textarea');
+			textarea.id = this.opaction.id + '_textarea';
+			parent.appendChild(textarea);
+			this.editor = CodeMirror.fromTextArea(document.getElementById(this.opaction.id + '_textarea'), this.opaction);
+		}
+	}
 	//dom布局
 	DomLayout() {
 		/*创建外层dom*/
@@ -313,7 +324,7 @@ class CodeMirrorPackage extends Unit {
 			this.DisplayArea(
 				this.opaction.text_text[1] || '编程实践区',
 				true,
-				this.opaction.id,
+				'CodeMirrorPackageEditor',
 				'programming-practice-displayArea',
 			)
 		);
@@ -366,10 +377,16 @@ class CodeMirrorPackage extends Unit {
 			);
 			/*增加分区 */
 			div.appendChild(this.EditorResizer());
-		}
-		let body = document.body;
+		};
+		let body;
+		if (this.opaction.id) {
+			body = document.querySelector(`#${this.opaction.id}`);
+		} else {
+			body = document.body;
+		};
 		body.appendChild(div);
 		this.CenterDomWidth();
+		this.OperationButtonGeneration();
 		this.ResizerMove();
 	}
 	//初始化内容宽度
@@ -567,9 +584,8 @@ class CodeMirrorPackage extends Unit {
 			}
 		};
 	}
-SelectGeneration
 	//编程实践区 模式选择框 生成
-	() {
+	SelectGeneration() {
 		let parent = document.querySelector(".programming-practice-displayArea .editor-title");
 		let button = document.createElement("button");
 		button.className = 'choose-mode';
@@ -652,7 +668,8 @@ SelectGeneration
 
 	//编程实践区 编辑器生成
 	CodeMirrorInit() {
-		this.editor = CodeMirror.fromTextArea(document.getElementById(this.opaction.id), this.opaction);
+		this.editor = CodeMirror.fromTextArea(document.getElementById('CodeMirrorPackageEditor'), this.opaction);
+		this.SetSize();
 	}
 
 	//教师源码展示区 编辑器生成
@@ -688,10 +705,16 @@ SelectGeneration
 							}
 						</style>
 						<script>
-							document.write('请在控制台查看输出')
-						</script>
-						<script>
+						try{
+							var codemirrorpackageLog;
+							console.codemirrorpackageLog = console.log;
+							console.log = function(val){
+								document.write("<div>" + val + "</div>")
+							}
 							${val};
+						}catch(err){
+							document.write("<div style='color:red;'>" + err + "</div>")
+						}
 						</script>
 					`;
 		} else {
@@ -741,10 +764,10 @@ SelectGeneration
 	}
 	//初始化
 	Init() {
-		if (!this.opaction.id) {
-			throw new Error('必须传入ID<document.getElementById()>');
-			return false;
-		}
+		// if (!this.opaction.id) {
+		// 	throw new Error('必须传入ID<document.getElementById()>');
+		// 	return false;
+		// }
 		//插件
 		this.CodeMirrorMode();
 		this.StyleActiveLine();
@@ -757,15 +780,16 @@ SelectGeneration
 		//渲染布局
 		if (this.opaction.operation_method == '1' || this.opaction.operation_method == '2') {
 			this.DomLayout();
+			this.CodeMirrorInit();
 			if (this.opaction.operation_method == '2') {
 				this.TeacherSourceCode();
 			};
-			this.OperationButtonGeneration();
 		};
 
-		//编辑器初始化
-		this.CodeMirrorInit();
-		this.SetSize();
+		//不需要渲染布局  直接渲染编辑器
+		if (!this.opaction.operation_method) {
+			this.DomLayoutNull();
+		}
 	}
 
 	//动态改变编辑器属性
@@ -799,11 +823,11 @@ SelectGeneration
 export { CodeMirrorPackage };
 
 const codemirrorpackage = new CodeMirrorPackage({
-	id: 'code',
+	//id: 'test',
 	mode: 'htmlmixed',
-	//text_text: ['操作要求', '编程实践区', '样式展示区'],
-	text_text: ['操作要求', '编程实践区', '样式展示区', '教师源码', '样式要求'],
-	operation_method: '2', //1 操作式  2 命题式
+	text_text: ['操作要求', '编程实践区', '样式展示区'],
+	//text_text: ['操作要求', '编程实践区', '样式展示区', '教师源码', '样式要求'],
+	operation_method: '1', //1 操作式  2 命题式
 	replaceFind: true,
 	//fullScreen:true
 });
@@ -826,10 +850,10 @@ codemirrorpackage.AddEventForRun((val) => {
 })
 
 //要求样式 赋值
-codemirrorpackage.RequestStyleSetVal('<h1>要求样式</h1>')
+//codemirrorpackage.RequestStyleSetVal('<h1>要求样式</h1>')
 
 //教师源码赋值
-codemirrorpackage.TeacherSourceSetVal('123');
+//codemirrorpackage.TeacherSourceSetVal('123');
 
 
 console.log(codemirrorpackage);
