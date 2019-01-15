@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/MrRenzhennan/CodeMirror-Package#readme",
   "dependencies": {
+    "@babel/polyfill": "^7.2.5",
     "codemirror": "^5.42.2",
     "webpack": "^4.28.3"
   },
