@@ -374,12 +374,72 @@ span.CodeMirror-selectedtext { background: none; }
 }
 .CodeMirrorPackage .editor-title {
 	height: 40px;
+	width: 100%;
 	position: absolute;
 	top: 0;
-	left: 20px;
+	left: 0;
 	color: #fff;
-	font-size: 18px;
+	font-size: 16px;
 	line-height: 40px;
+	min-width: 300px;
+}
+.CodeMirrorPackage .editor-title .choose-mode{
+	position: absolute;
+    right: 5px;
+	bottom: 5px;
+	background: #36383f;
+	border-radius: 2px;
+	width: 32px;
+	height: 25px;
+	border: none;
+}
+.CodeMirrorPackage .editor-title .choose-mode:hover{
+	background: #4e505a;
+}
+.CodeMirrorPackage .editor-title .choose-mode-ul{
+	width: 220px;
+	padding: 5px 0;
+	border-radius: 3px;
+	color: #222;
+	line-height: 1.5;
+    font-size: 15px;
+	font-weight: 400;
+	background: #fff;
+	position: absolute;
+	top: 40px;
+	right: 5px;
+	display: none;
+	z-index: 999;
+}
+.CodeMirrorPackage .editor-title .choose-mode-li{
+    color: black;
+    display: block;
+    width: 100%;
+    text-align: left;
+    border-radius: 0;
+    padding: 7px 15px 8px;
+    line-height: 1.1;
+    font-size: 0.9rem;
+	text-shadow: none;
+	box-sizing: border-box;
+	cursor: pointer;
+}
+.CodeMirrorPackage .editor-title .choose-mode-li:hover{
+	background: #c7c7c769;
+}
+.CodeMirrorPackage .editor-title .current-mode{
+    position: absolute;
+    top: 0;
+    padding: 2px 5px;
+    color: #fff;
+    background: #36383f;
+    transform: translateX(-50%);
+    left: 50%;
+    font-size: 12px;
+    height: 19px;
+    line-height: 19px;
+	border-radius: 0 0 5px 5px;
+	box-shadow: 0px 0px 10px #fff;
 }
 .CodeMirrorPackage .displayArea-box {
 	width: 25%;
@@ -389,16 +449,31 @@ span.CodeMirror-selectedtext { background: none; }
 	float: left;
 	position: relative;
 	overflow: hidden;
+	transition: width 0.1s linear;
+	/* Firefox 4 */
+	-moz-transition:width 0.1s linear;
+	/* Safari and Chrome */
+	-webkit-transition:width 0.1s linear;
+	/* Opera */
+	-o-transition:width 0.1s linear;
 }
 .CodeMirrorPackage .displayArea-box .displayArea {
 	width: 100%;
 	height: 100%;
 	background: #000;
+	color: #fff;
+    box-sizing: border-box;
+	padding: 10px;
+	min-width: 200px;
+}
+.CodeMirrorPackage .programming-practice-displayArea .displayArea,.CodeMirrorPackage .teacher-source-code .displayArea{
+	padding: 0px;
 }
 .CodeMirrorPackage .programming-practice-displayArea .operation {
 	position: absolute;
 	width: 100%;
 	bottom: 33px;
+	min-width: 200px;
 }
 .CodeMirrorPackage .programming-practice-displayArea .operation button {
 	position: absolute;
@@ -406,22 +481,23 @@ span.CodeMirror-selectedtext { background: none; }
 	border: none;
 	color: #fff;
 }
-.CodeMirrorPackage .programming-practice-displayArea .operation .button1 {
+.CodeMirrorPackage .programming-practice-displayArea .operation .reset-btn {
 	left: 0;
 	background: #ff6600;
 }
-.CodeMirrorPackage .programming-practice-displayArea .operation .button2 {
+.CodeMirrorPackage .programming-practice-displayArea .operation .run-btn {
 	right: 0;
 	background: #ff0000;
 }
-.CodeMirrorPackage .programming-practice-displayArea .operation .button3 {
+.CodeMirrorPackage .programming-practice-displayArea .operation .source-code-btn {
 	right: 100px;
 	background: #666666;
 }
-.CodeMirrorPackage .programming-practice-displayArea .operation .button4 {
+.CodeMirrorPackage .programming-practice-displayArea .operation .carry-on {
 	right: 100px;
 	background: #3399FF;
 }
+
 
 .CodeMirror-simplescroll-horizontal div, .CodeMirror-simplescroll-vertical div {
   position: absolute;
