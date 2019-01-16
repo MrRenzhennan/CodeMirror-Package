@@ -349,7 +349,9 @@ span.CodeMirror-selectedtext { background: none; }
 	margin: 0;
 	padding: 0;
 }
-
+.CodeMirror{
+	font-size: 16px;
+}
 .CodeMirrorPackage {
 	width: 100%;
 	height: 100%;

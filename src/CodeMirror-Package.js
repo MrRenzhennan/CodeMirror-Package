@@ -25,13 +25,13 @@ class Unit {
 		}
 	}
 	//iframe生成
-	IframeCreate() {
-		let iframe = document.createElement("iframe");
-		iframe.setAttribute('frameborder', '0');
-		iframe.setAttribute('width', '100%');
-		iframe.setAttribute('height', '100%');
-		return iframe
-	}
+	// IframeCreate() {
+	// 	let iframe = document.createElement("iframe");
+	// 	iframe.setAttribute('frameborder', '0');
+	// 	iframe.setAttribute('width', '100%');
+	// 	iframe.setAttribute('height', '100%');
+	// 	return iframe
+	// }
 	//dom赋值
 	DomSetVal(dom = '', text = '') {
 		if (dom) {
@@ -100,32 +100,19 @@ class CodeMirrorPackage extends Unit {
 		this.old_opaction = {
 			id: '',
 			value: '', //编辑器的起始值
-			operation_method: '',//是否需要渲染布局
-			mode: 'text/javascript', //编辑器解析模式
-			SupportMode: [
-				{ text: 'javascript', mode: 'text/javascript' },
-				{ text: 'html/css/js', mode: 'htmlmixed' },
-				{ text: 'python', mode: 'text/x-python' },
-				{ text: 'java', mode: 'text/x-java' },
-				{ text: 'c#', mode: '' }
-			],//可选择语言模式
 			lineSeparator: null, //显式设置编辑器的行分隔符
-			theme: 'colorforth', //设置主题
-			styleActiveLine: true, // 当前行背景高亮
 			indentUnit: 2, //一个块应该缩进多少空格
 			smartIndent: true, //是否使用模式提供的上下文相关缩进
 			tabSize: 4, //Tab表示几个空格
 			indentWithTabs: false, //是否在缩进时，第一个N * tabSize空格应替换为N个制表符。 默认值为false。
 			electricChars: true, //配置编辑器在键入可能更改其正确缩进的字符时是否应重新缩进当前行（仅在模式支持缩进时才有效）
 			direction: 'ltr', //翻转整体布局并选择基本段落方向为从左到右或从右到左
-			lineWrapping: true, //对于较长的行，CodeMirror应该滚动还是换行,默认为false(滚动)。  代码折叠
 			lineNumbers: true, //是否显示编辑器左侧的行号
 			firstLineNumber: 1, //从哪个数字开始计数行。默认值为1。
 			//lineNumberFormatter: function () { },//用于格式化行号的函数。 该函数传递给行号，并应返回将在装订线中显示的字符串
 			gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
 			foldGutter: true, //确定装订线是否水平滚动内容（false）或在水平滚动期间是否保持固定（true，默认值）
-			scrollbarStyle: 'overlay', //滚动条默认样式  null  native overlay
-			readOnly: false, //这将禁用用户编辑编辑器内容。如果指定了特殊值“nocursor”(而不是简单的true)，则也不允许编辑器聚焦
+			
 			showCursorWhenSelecting: false, //选择是否处于活动状态时是否应绘制光标。 默认为false。
 			lineWiseCopyCut: false, //启用时(默认情况下)，当没有选择时进行复制或剪切将复制或剪切其上有光标的整行
 			pasteLinesPerSelection: true, //当从外部源（而不是编辑器本身）粘贴某些内容时，如果行数与选择的数量相匹配，则CodeMirror将默认为每个选择插入一行。
@@ -133,7 +120,7 @@ class CodeMirrorPackage extends Unit {
 			undoDepth: 200, //编辑器存储的最大撤消级别数。 请注意，这包括选择更改事件。
 			historyEventDelay: 1250, //在键入或删除时将导致新历史事件开始的不活动时间（以毫秒为单位）。 默认为1250。
 			//tabindex:"",
-			autofocus: false, //初始化 获得焦点
+			autofocus: true, //初始化 获得焦点
 			dragDrop: true, //控制是否启用拖放。 默认开启
 			//allowDropFileTypes
 			cursorBlinkRate: 530, //用于光标闪烁的半周期（以毫秒为单位）。 默认闪烁率为530毫秒。 通过将此值设置为零，可以禁用闪烁。 负值完全隐藏光标。
@@ -145,18 +132,34 @@ class CodeMirrorPackage extends Unit {
 			addModeClass: false, //启用时（默认情况下为off），将为每个标记添加一个额外的CSS类，指示生成它的（内部）模式，前缀为“cm-m-”。
 			maxHighlightLength: true, //当高亮显示长行时，为了保持响应，编辑会放弃，当它到达某个位置时，简单地将行的其余部分设为纯文本。默认值为10，000。可以将此设置为Infinity以关闭此行为。
 			//viewportMargin
-			matchBrackets: true, //括号匹配
-			replaceFind: false, //启动搜索替换
-			fullScreen: false, //是否启用全屏
 			//specialChars:"",//一个正则表达式，用于确定哪些字符应该被特殊占位符替换
 			//specialCharPlaceholder:function(){},//给定由specialChars选项标识的特殊字符的函数，生成用于表示字符的DOM节点
 			//rtlMoveVisually:"",
 			//keyMap:"默认值为“default”",//配置要使用的键映射。
-			extraKeys: {} //可用于为编辑器指定额外的键绑定
 			//inputStyle:"",//选择CodeMirror处理输入和焦点的方式。 核心库定义了“textarea”和“contenteditable”输入模型
 			//configureMouse:function(){},//
 			//workTime
 			//workDelay
+			operation_method: '',//是否需要渲染布局
+			text_text:[],
+			mode: 'text/javascript', //编辑器解析模式
+			SupportMode: [
+				{ text: 'javascript', mode: 'text/javascript' },
+				{ text: 'html/css/js', mode: 'htmlmixed' },
+				{ text: 'python', mode: 'text/x-python' },
+				{ text: 'java', mode: 'text/x-java' },
+				{ text: 'c#', mode: '' }
+			],//可选择语言模式
+			theme: 'colorforth', //设置主题
+			scrollbarStyle: 'overlay', //滚动条默认样式  null  native overlay
+			extraKeys: {}, //可用于为编辑器指定额外的键绑定
+			lineWrapping: true, //对于较长的行，CodeMirror应该滚动还是换行,默认为false(滚动)。  代码折叠
+			readOnly: false, //这将禁用用户编辑编辑器内容。如果指定了特殊值“nocursor”(而不是简单的true)，则也不允许编辑器聚焦
+			styleActiveLine: true, // 当前行背景高亮
+			matchBrackets: true, //括号匹配
+			replaceFind: true, //启动搜索替换
+			fullScreen: false, //是否启用全屏
+        	continueComments: "Enter",//在注释行按下Enter 下一行会跟着注释
 		};
 		this.opaction = Object.assign(this.old_opaction, opaction);
 		this.editor = null;
@@ -219,6 +222,22 @@ class CodeMirrorPackage extends Unit {
 			跳到线上
 		*/
 	}
+	//括号匹配
+	Matchbrackets(){
+		if(this.opaction.matchBrackets){
+			require('codemirror/addon/edit/matchbrackets.js');
+		}
+	}
+	//用于注释和取消注释代码的插件
+	Comment(){
+		if(this.opaction.continueComments){
+			require('codemirror/addon/comment/continuecomment.js');
+			require('codemirror/addon/comment/comment.js');
+		}
+		//Ctrl-Q 注释当前行
+		this.opaction.extraKeys = Object.assign(this.opaction.extraKeys, {"Ctrl-Q": "toggleComment"});
+	}
+	
 	//全屏
 	FullScreen() {
 		if (this.opaction.fullScreen) {
@@ -262,7 +281,11 @@ class CodeMirrorPackage extends Unit {
 			case 'text/x-java': //java
 				require('codemirror/mode/clike/clike.js');
 				break;
-			case 'htmlmixed': //html
+			case 'htmlmixed': //html js css
+				require('codemirror/mode/javascript/javascript.js');
+				require('codemirror/mode/xml/xml.js');
+				require('codemirror/mode/css/css.js');
+				require('codemirror/mode/vbscript/vbscript.js');
 				require('codemirror/mode/htmlmixed/htmlmixed.js');
 				break;
 			case 'text/x-sql': //sql
@@ -352,6 +375,7 @@ class CodeMirrorPackage extends Unit {
 					false,
 					'',
 					'show-case',
+					'display:none'
 				)
 			);
 			/* 教师源码 */
@@ -361,7 +385,7 @@ class CodeMirrorPackage extends Unit {
 					true,
 					'teacher-source-code',
 					'teacher-source-code',
-					'display:none'
+					//'display:none'
 				)
 			);
 			/*增加分区 */
@@ -557,7 +581,7 @@ class CodeMirrorPackage extends Unit {
 			};
 			document.getElementsByClassName('show-case')[0].style.display = 'none';
 			document.getElementsByClassName('teacher-source-code')[0].style.display = 'block';
-			this.DisplayAreaWidthRestore()
+			this.DisplayAreaWidthRestore();
 			if (callback) {
 				callback()
 			}
@@ -640,9 +664,9 @@ class CodeMirrorPackage extends Unit {
 			if (_target.tagName.toUpperCase() == 'LI') {
 				this.opaction.mode = _target.getAttribute('data-dropdown-position');
 				this.ResetContent();
-				this.CodeMirrorSetOpaction('mode', this.opaction.mode)
 				this.CurrentMode(this.DomGetVal(_target));
-				this.CodeMirrorMode()
+				this.CodeMirrorMode();
+				this.CodeMirrorSetOpaction('mode', this.opaction.mode);
 			};
 		};
 	}
@@ -676,7 +700,7 @@ class CodeMirrorPackage extends Unit {
 	TeacherSourceCode() {
 		this.teacherEditor = CodeMirror.fromTextArea(document.getElementById('teacher-source-code'), this.opaction);
 		this.teacherEditor.setSize('100%', '100%');
-		this.teacherEditor.setOption("readOnly", 'nocursor');
+		this.teacherEditor.setOption("readOnly", 'nocursor');//nocursor true
 	}
 
 	//教师展示区赋值
@@ -768,14 +792,19 @@ class CodeMirrorPackage extends Unit {
 		// 	throw new Error('必须传入ID<document.getElementById()>');
 		// 	return false;
 		// }
+
 		//插件
-		this.CodeMirrorMode();
 		this.StyleActiveLine();
 		this.CodeMirrorTheme();
 		this.ScrollbarStyle();
 		this.CodeReplaceFind();
 		this.FullScreen();
 		this.CodeFold();
+		this.Matchbrackets();
+		this.Comment();
+		this.CodeMirrorMode();
+
+
 
 		//渲染布局
 		if (this.opaction.operation_method == '1' || this.opaction.operation_method == '2') {
@@ -783,6 +812,8 @@ class CodeMirrorPackage extends Unit {
 			this.CodeMirrorInit();
 			if (this.opaction.operation_method == '2') {
 				this.TeacherSourceCode();
+				document.querySelector('.teacher-source-code').style.display = 'none';
+				document.querySelector('.show-case').style.display = 'block';
 			};
 		};
 
@@ -822,38 +853,36 @@ class CodeMirrorPackage extends Unit {
 }
 export { CodeMirrorPackage };
 
-// const codemirrorpackage = new CodeMirrorPackage({
-// 	//id: 'test',
-// 	mode: 'htmlmixed',
-// 	text_text: ['操作要求', '编程实践区', '样式展示区'],
-// 	//text_text: ['操作要求', '编程实践区', '样式展示区', '教师源码', '样式要求'],
-// 	operation_method: '1', //1 操作式  2 命题式
-// 	replaceFind: true,
-// 	//fullScreen:true
-// });
+const codemirrorpackage = new CodeMirrorPackage({
+	//id: 'test',
+	mode: 'htmlmixed',
+	//text_text: ['操作要求', '编程实践区', '样式展示区'],
+	//text_text: ['操作要求', '编程实践区', '样式展示区', '教师源码', '样式要求'],
+	operation_method: '2', //1 操作式  2 命题式
+});
 
-// //显示按钮 切换模式
-// codemirrorpackage.SelectGeneration();
+//显示按钮 切换模式
+codemirrorpackage.SelectGeneration();
 
-// //操作要求赋值
-// codemirrorpackage.programmingRequirementsSetVal('操作要求')
+//操作要求赋值
+codemirrorpackage.programmingRequirementsSetVal('操作要求')
 
-// //编辑器change事件
-// codemirrorpackage.OnChange(function (instance, changeObject, val) {
-// 	console.log(instance, changeObject, val)
-// });
+//编辑器change事件
+codemirrorpackage.OnChange(function (instance, changeObject, val) {
+	console.log(instance, changeObject, val)
+});
 
-// //开始运行
-// codemirrorpackage.AddEventForRun((val) => {
-// 	//样式展示区赋值
-// 	codemirrorpackage.ShowCaseSetVal(val)
-// })
+//开始运行
+codemirrorpackage.AddEventForRun((val) => {
+	//样式展示区赋值
+	codemirrorpackage.ShowCaseSetVal(val)
+})
 
 //要求样式 赋值
-//codemirrorpackage.RequestStyleSetVal('<h1>要求样式</h1>')
+codemirrorpackage.RequestStyleSetVal('<h1>要求样式</h1>')
 
 //教师源码赋值
-//codemirrorpackage.TeacherSourceSetVal('123');
+codemirrorpackage.TeacherSourceSetVal('<h1>要求样式</h1>');
 
 
-//console.log(codemirrorpackage);
+console.log(codemirrorpackage);
